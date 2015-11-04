@@ -8,15 +8,12 @@ if [[ -z "$GRPDIR" ]]; then
     exit 1
 fi
 
-if [[ -z "$STOWDIR" ]]; then
-    echo "\$STOWDIR is not set." >&2
-    exit 1
-fi
-
 if [[ ! -d "$GRPDIR" ]]; then
     echo "$GRPDIR not found." >&2
     exit 1
 fi
+
+export STOWDIR=$GRPDIR/packages
 
 if [[ ! -d "$STOWDIR" ]]; then
     echo "$STOWDIR not found." >&2
@@ -33,4 +30,4 @@ fi
 source $PACKAGE
 
 cd $STOWDIR
-stow -t $GRPDIR -D $pkgname
+stow -D --ignore=README $pkgname

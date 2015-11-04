@@ -3,15 +3,14 @@
 # Install all packages to /tmp/hacksoc-grp
 
 export GRPDIR=${GRPDIR:-/tmp/hacksoc-grp}
-export STOWDIR=${STOWDIR:-/tmp/hacksoc-grp/packages}
 
 if [[ ! -d "$GRPDIR" ]]; then
     echo "$GRPDIR not found." >&2
     exit 1
 fi
 
-if [[ ! -d "$STOWDIR" ]]; then
-    echo "$STOWDIR not found." >&2
+if [[ ! -d "$GRPDIR/packages" ]]; then
+    echo "$GRPDIR/packages not found." >&2
     exit 1
 fi
 
