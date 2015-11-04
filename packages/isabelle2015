@@ -1,0 +1,8 @@
+pkgname=isabelle2015
+stow_opts="--ignore=ANNOUNCE --ignore=CONTRIBUTORS --ignore=COPYRIGHT --ignore=NEWS --ignore=README --ignore=ROOTS"
+
+function build() {
+    wget "https://www.cl.cam.ac.uk/research/hvg/Isabelle/dist/Isabelle2015_linux.tar.gz"
+    tar xf Isabelle2015_linux.tar.gz
+    mv Isabelle2015 $PKGDIR
+}
