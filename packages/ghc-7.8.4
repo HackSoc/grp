@@ -1,0 +1,21 @@
+pkgname=ghc-7.8.4
+stow_opts="--ignore=bin/ghc --ignore=bin/ghci --ignore=bin/ghc-pkg --ignore=bin/haddock --ignore=bin/hp2ps --ignore=bin/hpc --ignore=bin/hsc2hs --ignore=bin/runghc --ignore=bin/runhaskell --ignore=share"
+
+function build() {
+    wget "https://www.haskell.org/ghc/dist/7.8.4/ghc-7.8.4-x86_64-unknown-linux-deb7.tar.xz"
+    tar xf "ghc-7.8.4-x86_64-unknown-linux-deb7.tar.xz"
+    cd "ghc-7.8.4"
+
+    ./configure --prefix=$GRPDIR
+    make DESTDIR=.installed install
+    mv .installed/$GRPDIR $PKGDIR
+
+    # Rename un-versioned binaries
+    mv $PKGDIR/bin/hp2ps  $PKGDIR/bin/hp2ps-7.8.4
+    mv $PKGDIR/bin/hpc    $PKGDIR/bin/hpc-7.8.4
+    mv $PKGDIR/bin/hsc2hs $PKGDIR/bin/hsc2hs-7.8.4
+
+    ln -s $PKGDIR/bin/hp2ps-7.8.4  $PKGDIR/bin/hp2ps
+    ln -s $PKGDIR/bin/hpc-7.8.4    $PKGDIR/bin/hpc
+    ln -s $PKGDIR/bin/hsc2hs-7.8.4 $PKGDIR/bin/hsc2hs
+}
