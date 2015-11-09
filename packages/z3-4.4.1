@@ -1,0 +1,21 @@
+pkgname=z3-4.4.1
+
+function build() {
+    wget "https://github.com/Z3Prover/z3/archive/z3-4.4.1.tar.gz"
+    tar xf "z3-4.4.1.tar.gz"
+    cd z3-z3-4.4.1
+
+    # Make
+    python2 scripts/mk_make.py
+    cd build
+    make
+
+    # Install
+    cd ..
+    python2 scripts/mk_make.py --prefix=$PKGDIR
+    cd build
+    make install
+    mv "$PKGDIR/lib/python2.7/dist-packages" "$PKGDIR/lib/python2.7/site-packages"
+    rm "$PKGDIR/lib/python2.7/site-packages/libz3.so"
+    ln -s ../../libz3.so "$PKGDIR/lib/python2.7/site-packages/libz3.so"
+}
