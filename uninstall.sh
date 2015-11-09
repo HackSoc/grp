@@ -2,11 +2,7 @@
 
 # Uninstall a single package
 
-
-if [[ -z "$GRPDIR" ]]; then
-    echo "\$GRPDIR is not set." >&2
-    exit 1
-fi
+export GRPDIR=${GRPDIR:-/tmp/hacksoc-grp}
 
 if [[ ! -d "$GRPDIR" ]]; then
     echo "$GRPDIR not found." >&2
