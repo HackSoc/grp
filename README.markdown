@@ -3,18 +3,15 @@ hacksoc-grp
 
 
 hacksoc-grp (pronounced "HackSoc Group"), or simply grp, is a
-collection of software maintained by [HackSoc](https://hacksoc.org)
-for use with the ITS linux machines, which would not otherwise be
-provided: more up-to-date packages, things which aren't strictly
-course-related, that sort of thing. All packages are built with a
-prefix of /tmp/hacksoc-grp.
+collection of software maintained by [HackSoc][] for use with the ITS
+linux machines, which would not otherwise be provided: more up-to-date
+packages, things which aren't strictly course-related, that sort of
+thing. All packages are built with a prefix of /tmp/hacksoc-grp.
 
 You can see all packages which have been installed by listing
-/tmp/hacksoc-grp/pkg, and all versions of a particular package by
-listing /tmp/hacksoc-grp/pkg/<name>.
+/tmp/hacksoc-grp/packages.
 
-To request new software for grp, simply email hack@yusu.org, and we'll
-look into it.
+[HackSoc]: https://hacksoc.org
 
 Mounting
 --------
@@ -52,3 +49,84 @@ function grprun() {
     $*
 }
 ```
+
+Adding Packages
+---------------
+
+**For normal people:** email us, ping us on IRC, whatever.
+
+**For people with access to klaxon, or those feeling particularly
+helpful:** grp is based on [GNU Stow][], a tool for managing
+hierarchies of symlinks. Packaging something consists in writing a
+script which will build it, and supply any necessary options to `stow`
+when it is installed.
+
+For example, Isabelle 2015:
+
+```bash
+pkgname=isabelle2015
+stow_opts="--ignore=ANNOUNCE --ignore=CONTRIBUTORS --ignore=COPYRIGHT --ignore=NEWS --ignore=README --ignore=ROOTS"
+
+function build() {
+    wget "https://www.cl.cam.ac.uk/research/hvg/Isabelle/dist/Isabelle2015_linux.tar.gz"
+    tar xf Isabelle2015_linux.tar.gz
+    mv Isabelle2015 $PKGDIR
+}
+```
+
+Firstly, the package is given a name, this influences where is is
+installed. There are some pre-determined environmental variables:
+
+- `$GRPDIR`, the path of grp, `/tmp/hacksoc-grp` by default.
+- `$STOWDIR`, the directory managed by `stow`, `$GRPDIR/packages` by
+  default.
+- `$PKGDIR`, the installation path of the package, `$STOWDIR/$pkgname`
+  by default.
+
+*`$STOWDIR/..` must be `$GRPDIR`*, as otherwise `stow` will use
+symlink paths that don't work so nicely over sshfs.
+
+Secondly, options to `stow` are provided. Typically this field should
+be empty, or consist only of a list of file exclusions.
+
+Finally, a function to build the package is produced. This is a binary
+distribution of Isabelle 2015, so all that needs to happen here is to
+extract the tarball to the right place.
+
+A package will be built when it is first installed, after that
+`uninstall.sh` and `install.sh` will only add or remove symlinks, to
+prevent repeating work needlessly.
+
+A more complex `build` function is used in the z3-4.4.1 package:
+
+```bash
+function build() {
+    wget "https://github.com/Z3Prover/z3/archive/z3-4.4.1.tar.gz"
+    tar xf "z3-4.4.1.tar.gz"
+    cd z3-z3-4.4.1
+
+    # Make
+    python2 scripts/mk_make.py
+    cd build
+    make
+
+    # Install
+    cd ..
+    python2 scripts/mk_make.py --prefix=$PKGDIR
+    cd build
+    make install
+    mv "$PKGDIR/lib/python2.7/dist-packages" "$PKGDIR/lib/python2.7/site-packages"
+    rm "$PKGDIR/lib/python2.7/site-packages/libz3.so"
+    ln -s ../../libz3.so "$PKGDIR/lib/python2.7/site-packages/libz3.so"
+}
+```
+
+This is a source distribution of z3, so it needs to be compiled
+first. If you're not sure how to compile something, check if there is
+an Arch package in the [repositories][] or the [AUR][]. Arch PKGBUILD
+files are easy to read and somebody else has already figured out all
+the build system quirks for you.
+
+[GNU Stow]:     https://www.gnu.org/software/stow
+[repositories]: https://www.archlinux.org/packages
+[AUR]:          https://aur.archlinux.org
