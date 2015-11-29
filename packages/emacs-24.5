@@ -1,0 +1,12 @@
+pkgname=emacs-24.5
+
+function build() {
+  wget ftp://ftp.gnu.org/gnu/emacs/$pkgname.tar.xz
+  tar xf $pkgname.tar.xz
+  cd $pkgname
+
+  ./configure --prefix=$PKGDIR --with-x-toolkit=gtk3 --with-xft
+  make
+
+  make install
+}
