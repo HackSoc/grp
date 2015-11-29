@@ -1,0 +1,17 @@
+pkgname=git-2.6.3
+
+build() {
+  wget https://www.kernel.org/pub/software/scm/git/$pkgname.tar.xz
+  tar xf $pkgname.tar.xz
+  cd $pkgname
+
+  make prefix=$PKGDIR gitexecdir=$PKGDIR/lib/git-core \
+    USE_LIBPCRE=1 \
+    NO_CROSS_DIRECTORY_HARDLINKS=1 \
+    all doc install install-doc
+  make -C contrib/emacs prefix=$PKGDIR install
+  make -C contrib/subtree prefix=$PKGDIR all doc install install-doc
+
+  mkdir $PKGDIR/share/git
+  cp -a ./contrib/* $PKGDIR/share/git/
+}
