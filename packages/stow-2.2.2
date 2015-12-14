@@ -1,0 +1,13 @@
+pkgname=stow-2.2.2
+
+build() {
+    wget ftp://ftp.gnu.org/pub/gnu/stow/$pkgname.tar.gz
+    tar xf $pkgname.tar.gz
+    cd $pkgname
+
+    ./configure --prefix=$PKGDIR
+    make
+    make install
+
+    rm $PKGDIR/share/info/dir
+}
