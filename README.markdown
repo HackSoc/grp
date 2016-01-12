@@ -127,6 +127,37 @@ an Arch package in the [repositories][] or the [AUR][]. Arch PKGBUILD
 files are easy to read and somebody else has already figured out all
 the build system quirks for you.
 
+For Server Administrators
+-------------------------
+
+If the instance of grp is to be publically accessible, as it is on
+klaxon, an ssh chroot should be used to prevent users from
+escaping. Assuming the user grp, this snippet of sshd_config will do
+the job:
+
+```
+Match User grp
+   ChrootDirectory /var/hacksoc-grp
+   ForceCommand internal-sftp
+   AllowTcpForwarding no
+   PermitTunnel no
+   X11Forwarding no
+```
+
+The chroot directory, and all of its parents, must be owned by
+root:root and not be writable by anyone else. The easiest way to
+achieve this is for `/`, `/var`, and `/var/hacksoc-grp` to be owned by
+root:root and have permissions 755.
+
+The symlink `/tmp/hacksoc-grp` is also provided, so that build scripts
+can use the same prefix as the eventual user-mounted filesystem. If
+`/tmp` is a permanent filesystem, then the symlink could be avoided
+and a standard directory used instead, but storing permanent files in
+`/tmp` is bad practice and should be avoided regardless.
+
+If passwordless access is desired, then the grp user should be given
+no password, and `PermitEmptyPasswords` enabled in the sshd_config.
+
 [GNU Stow]:     https://www.gnu.org/software/stow
 [repositories]: https://www.archlinux.org/packages
 [AUR]:          https://aur.archlinux.org
