@@ -1,0 +1,23 @@
+_name=ghc
+_ver=7.10.3
+_mver=b
+
+pkgname=${_name}-${_ver}
+stow_opts="--ignore=share"
+
+function build() {
+    wget "http://downloads.haskell.org/~ghc/${_ver}/${pkgname}${_mver}-x86_64-deb8-linux.tar.xz"
+    tar xf "${pkgname}${_mver}-x86_64-deb8-linux.tar.xz"
+    cd $pkgname
+
+    ./configure --prefix=$GRPDIR
+    make DESTDIR=.installed install
+    mv .installed/$GRPDIR $PKGDIR
+
+    # Rename un-versioned binaries
+    for bin in hp2ps hpc hsc2hs; do
+        mv $PKGDIR/bin/$bin $PKGDIR/bin/$bin-$pkgver
+
+        ln -s $PKGDIR/bin/$bin-$pkgver $PKGDIR/bin/$bin
+    done
+}
